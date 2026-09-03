@@ -70,9 +70,26 @@ The unauthorized update was rejected during simulation with MPL Core `NoApproval
 
 Required:
 
-1. SPL Mint — <!-- Insert screenshot -->
-2. SPL Transfer — <!-- Insert screenshot -->
-3. NFT Create — <!-- Insert screenshot -->
-4. NFT Update — <!-- Insert screenshot -->
-5. NFT Transfer — <!-- Insert screenshot -->
-6. NFT Burn — <!-- Insert screenshot -->
+1. SPL Mint
+
+   ![SPL Mint devnet transaction](screenshots/spl-mint.png)
+
+2. SPL Transfer
+
+   ![SPL Transfer devnet transaction](screenshots/spl-transfer.png)
+
+3. NFT Create
+
+   ![NFT Create devnet transaction](screenshots/nft-create.png)
+
+4. NFT Update
+
+   ![NFT Update devnet transaction](screenshots/nft-update.png)
+
+5. NFT Transfer
+
+   ![NFT Transfer devnet transaction](screenshots/nft-transfer.png)
+
+6. NFT Burn
+
+   ![NFT Burn devnet transaction](screenshots/nft-burn.png)
