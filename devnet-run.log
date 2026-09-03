@@ -1,0 +1,96 @@
+
+> scripts-solana-2@1.0.0 test:devnet
+> RUN_DEVNET_TESTS=true node --test -r ts-node/register tests/devnet.integration.test.ts
+
+bigint: Failed to load bindings, pure JS will be used (try npm run rebuild?)
+[rpc] Devnet genesis hash: started
+[rpc] Devnet wallet balance: started
+[rpc] Devnet wallet balance: complete elapsed=302ms
+[rpc] Devnet genesis hash: complete elapsed=312ms
+
+Devnet preflight passed
+Wallet: /Users/mishra/.config/solana/id.json
+Address: C9CnYM5j7bkH2JcBXkd4L9aYThLsSDnuDrDyJgg7thJh
+Balance: 4.55326346 SOL
+Cluster: devnet
+RPC: https://api.devnet.solana.com/
+
+[1/8] Create SPL Mint: started
+[rpc] SPL mint rent exemption: started
+[rpc] SPL mint rent exemption: complete elapsed=114ms
+[tx] SPL transaction: signature=Yt6R5g83g5bNRZ6rRdHkvibxhR5Jih2SXcifhkk1XxtbXhnmNy6D4DkKDpE4nk16X5AyrW7KsBKVy21iMUTe1Kr instructions=2 confirmation=confirmed status=sending
+[tx] SPL transaction: signature=Yt6R5g83g5bNRZ6rRdHkvibxhR5Jih2SXcifhkk1XxtbXhnmNy6D4DkKDpE4nk16X5AyrW7KsBKVy21iMUTe1Kr slot=492570202 confirmation=confirmed error=none elapsed=742ms
+[rpc] Verify created SPL mint: started
+[rpc] Verify created SPL mint: complete elapsed=75ms
+[1/8] Create SPL Mint: complete elapsed=1045ms
+[1/8] Create SPL Mint: mint=2ugQy2cgTyKRYgc7ohcQpjtxkU7LVuvunBtnh67FUUsm signature=Yt6R5g83g5bNRZ6rRdHkvibxhR5Jih2SXcifhkk1XxtbXhnmNy6D4DkKDpE4nk16X5AyrW7KsBKVy21iMUTe1Kr
+[2/8] Mint SPL Supply: started
+[rpc] Fetch SPL mint before minting: started
+[rpc] Fetch owner ATA before minting: started
+[rpc] Fetch SPL mint before minting: complete elapsed=119ms
+[rpc] Fetch owner ATA before minting: complete elapsed=119ms
+[tx] SPL transaction: signature=26fFocckYWFPdpxoHfVk3JaGKZFq51CzaFfSerjWCXFCMn9hkZkdTUbmZ8zGi8zi8JyfsCrH3DqHKNrcv2W55mKC instructions=2 confirmation=confirmed status=sending
+[tx] SPL transaction: signature=26fFocckYWFPdpxoHfVk3JaGKZFq51CzaFfSerjWCXFCMn9hkZkdTUbmZ8zGi8zi8JyfsCrH3DqHKNrcv2W55mKC slot=492570208 confirmation=confirmed error=none elapsed=632ms
+[rpc] Verify SPL mint supply: started
+[rpc] Verify owner ATA balance: started
+[rpc] Verify owner ATA balance: complete elapsed=79ms
+[rpc] Verify SPL mint supply: complete elapsed=84ms
+[2/8] Mint SPL Supply: complete elapsed=917ms
+[2/8] Mint SPL Supply: ata=FFeZRtws5TtMLwY3dD3oykhwZAMTJ8ezG81Kf9U8vMjK signature=26fFocckYWFPdpxoHfVk3JaGKZFq51CzaFfSerjWCXFCMn9hkZkdTUbmZ8zGi8zi8JyfsCrH3DqHKNrcv2W55mKC
+[3/8] Transfer SPL Tokens: started
+[rpc] Fetch source ATA before transfer: started
+[rpc] Fetch source ATA before transfer: complete elapsed=84ms
+[rpc] Fetch destination ATA before transfer: started
+[rpc] Fetch destination ATA before transfer: complete elapsed=85ms
+[tx] SPL transaction: signature=2AyXyForG5ZuDww2bn382yxcf6NsaiLrp7Bd2vtzQCsV6BpCzyWVoRirPd3mviyonLbQ74KLGdDy2UoLFSJiCvBZ instructions=2 confirmation=confirmed status=sending
+[tx] SPL transaction: signature=2AyXyForG5ZuDww2bn382yxcf6NsaiLrp7Bd2vtzQCsV6BpCzyWVoRirPd3mviyonLbQ74KLGdDy2UoLFSJiCvBZ slot=492570214 confirmation=confirmed error=none elapsed=665ms
+[rpc] Verify source ATA after transfer: started
+[rpc] Verify destination ATA after transfer: started
+[rpc] Verify source ATA after transfer: complete elapsed=79ms
+[rpc] Verify destination ATA after transfer: complete elapsed=290ms
+[3/8] Transfer SPL Tokens: complete elapsed=1214ms
+[3/8] Transfer SPL Tokens: recipient=4YKt6BJT9n4GC5YTc1AUyFsEDxuLMkmFq62jA2qmU9zZ signature=2AyXyForG5ZuDww2bn382yxcf6NsaiLrp7Bd2vtzQCsV6BpCzyWVoRirPd3mviyonLbQ74KLGdDy2UoLFSJiCvBZ
+[metadata] initial=https://raw.githubusercontent.com/aashwani106/spl-nft-q326/main/tests/fixtures/core-metadata.json
+[metadata] updated=https://raw.githubusercontent.com/aashwani106/spl-nft-q326/main/tests/fixtures/core-metadata-updated.json
+[4/8] Create MPL Core Asset: started
+[tx] Create MPL Core asset: preparing transaction
+[tx] Create MPL Core asset: signature=2njCbmNLgkxPTsmZfLQ1F2CB1xhjhMFTeFRPSWDphtZu8bxEnBMhLmpay4GzqUjwzuBKUaARhzbXD4zBKXjFaXEN status=submitted; awaiting finalized confirmation
+Server responded with 429 Too Many Requests.  Retrying after 500ms delay...
+Server responded with 429 Too Many Requests.  Retrying after 1000ms delay...
+[tx] Create MPL Core asset: signature=2njCbmNLgkxPTsmZfLQ1F2CB1xhjhMFTeFRPSWDphtZu8bxEnBMhLmpay4GzqUjwzuBKUaARhzbXD4zBKXjFaXEN slot=492570221 confirmation=finalized error=none elapsed=8172ms
+[rpc] Verify created MPL Core asset: fetchAsset address=4wwAsqnHtA1AsYKNpoegA5NfhEPx52kzaujEwywNBQbT
+[rpc] Verify created MPL Core asset: fetchAsset complete address=4wwAsqnHtA1AsYKNpoegA5NfhEPx52kzaujEwywNBQbT elapsed=89ms
+[4/8] Create MPL Core Asset: complete elapsed=8265ms
+[4/8] Create MPL Core Asset: asset=4wwAsqnHtA1AsYKNpoegA5NfhEPx52kzaujEwywNBQbT signature=2njCbmNLgkxPTsmZfLQ1F2CB1xhjhMFTeFRPSWDphtZu8bxEnBMhLmpay4GzqUjwzuBKUaARhzbXD4zBKXjFaXEN
+[5/8] Unauthorized Update Test: started
+[tx] Unauthorized MPL Core update: preparing transaction
+[tx] Unauthorized MPL Core update: signature=41qUsouuE2ePkPFTYvCwqP9BV8SKseaFSo73Vpq9w3SxfdbCDUzsrQJxh13vaphu3bkPA1ig8mm8LQQBSBkn6urh status=submitted; awaiting finalized confirmation
+[tx] Unauthorized MPL Core update: signature=41qUsouuE2ePkPFTYvCwqP9BV8SKseaFSo73Vpq9w3SxfdbCDUzsrQJxh13vaphu3bkPA1ig8mm8LQQBSBkn6urh slot=492570272 confirmation=finalized error=none elapsed=6131ms
+[5/8] Unauthorized Update Test: failed elapsed=6134ms error=AssertionError [ERR_ASSERTION]: Missing expected rejection.
+✖ full SPL Token and MPL Core lifecycle on devnet (17931.546791ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 20105.661708
+
+✖ failing tests:
+
+test at tests/devnet.integration.test.ts:51:25
+✖ full SPL Token and MPL Core lifecycle on devnet (17931.546791ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async /Users/mishra/Desktop/solana/turbine/spl-nft-q326/tests/devnet.integration.test.ts:112:9
+      at async lifecycleStep (/Users/mishra/Desktop/solana/turbine/spl-nft-q326/tests/devnet.integration.test.ts:34:20)
+      at async TestContext.<anonymous> (/Users/mishra/Desktop/solana/turbine/spl-nft-q326/tests/devnet.integration.test.ts:109:5)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'rejects',
+    diff: 'simple'
+  }

@@ -1,40 +1,40 @@
-import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
-import {
-  createGenericFile,
-  createSignerFromKeypair,
-  signerIdentity,
-} from "@metaplex-foundation/umi";
-import { irysUploader } from "@metaplex-foundation/umi-uploader-irys";
-import { readFile } from "fs/promises";
+import { readFile } from "node:fs/promises";
+import { basename, resolve } from "node:path";
+import { createGenericFile } from "@metaplex-foundation/umi";
+import { runCli } from "../cli";
+import { updateState } from "../state";
+import { createAssignmentUmi } from "../umi";
+import { elapsedMs, withTimeout } from "../diagnostics";
 
-import wallet from "../../devnet-wallet.json";
+export function inferImageContentType(path: string): string {
+  if (/\.png$/i.test(path)) return "image/png";
+  if (/\.webp$/i.test(path)) return "image/webp";
+  if (/\.gif$/i.test(path)) return "image/gif";
+  return "image/jpeg";
+}
 
-const umi = createUmi(
-  process.env.SOLANA_RPC_URL ?? "https://api.devnet.solana.com",
-);
+export async function uploadNftImage(imagePath = process.env.NFT_IMAGE_PATH ?? "image.jpeg") {
+  const { umi } = createAssignmentUmi({ uploader: true });
+  const absolutePath = resolve(imagePath);
+  const bytes = await readFile(absolutePath);
+  if (bytes.length === 0) throw new Error(`Image is empty: ${absolutePath}`);
+  const startedAt = Date.now();
+  console.log(`[upload] NFT image: file=${absolutePath} bytes=${bytes.length}`);
+  const [imageUri] = await withTimeout(
+    "NFT image upload",
+    umi.uploader.upload([
+      createGenericFile(bytes, basename(absolutePath), {
+        contentType: inferImageContentType(absolutePath),
+      }),
+    ]),
+  );
+  console.log(`[upload] NFT image: uri=${imageUri} elapsed=${elapsedMs(startedAt)}ms`);
+  updateState({ imageUri });
+  return imageUri;
+}
 
-const keypair = umi.eddsa.createKeypairFromSecretKey(new Uint8Array(wallet));
-const signer = createSignerFromKeypair(umi, keypair);
+async function main() {
+  console.log(`Image URI: ${await uploadNftImage()}`);
+}
 
-umi.use(
-  irysUploader({
-    address: "https://devnet.irys.xyz/",
-  }),
-);
-
-umi.use(signerIdentity(signer));
-
-(async () => {
-  try {
-    //chanege image path to your image path
-    const image = await readFile("file-path");
-
-    //change the image name and mime type
-    // const file =
-
-    // const [myUri] =
-    // console.log("Your image URI: ", myUri);
-  } catch (error) {
-    console.log(error);
-  }
-})();
+if (require.main === module) runCli(main);

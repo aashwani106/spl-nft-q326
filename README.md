@@ -1,72 +1,78 @@
-# scripts-solana
+# SPL Token + MPL Core Assignment
 
-Scripts for creating SPL tokens and NFTs on Solana devnet.
+TypeScript implementation of the complete SPL Token and MPL Core lifecycle on Solana devnet.
 
----
+## Features
+
+- SPL Mint
+- SPL Transfer
+- NFT Mint (MPL Core)
+- NFT Metadata Update
+- NFT Transfer
+- NFT Burn
 
 ## Setup
 
-### 1. Add your wallet
-
-Place your devnet wallet keypair file at the project root:
-
-```
-root/
-└── devnet-wallet.json   ← here
-```
-
-It should be a JSON array of numbers, e.g. `[174, 23, ...]`.
-
-### 2. Install dependencies
+Requirements: Node.js 20.18+, npm, Solana CLI, and a funded devnet wallet.
 
 ```bash
-npm install
+npm ci
+cp .env.example .env
+solana config set --url devnet
+solana airdrop 2 "$(solana address)" --url devnet
+npm run preflight:devnet
 ```
+
+`WALLET_PATH` is optional and falls back to `~/.config/solana/id.json`. Use a dedicated devnet RPC in `.env` if the public endpoint is rate-limited.
+
+## Run
 
 ```bash
-npm install --save-dev @types/node ts-node typescript
+npm run build
+npm test
+npm run test:devnet
 ```
 
-### 3. Add your image
+`npm test` runs offline tests and skips the devnet suite. `test:devnet` performs the complete lifecycle, including an expected unauthorized update rejection and the irreversible burn.
 
-Place your image at the project root.
+Individual commands are also available:
 
+```bash
+npm run spl:init && npm run spl:mint && npm run spl:transfer
+npm run nft:image && npm run nft:metadata && npm run nft:mint
+npm run nft:update && npm run nft:transfer && npm run nft:burn
 ```
-root/
-└── image.jpeg   ← here
-```
 
----
+The lifecycle uses these public metadata documents after this branch is pushed to `main`:
 
-> Before running the scripts, go through these docs:
-> - [Solana token docs](https://solana.com/docs/tokens) — mint accounts, token accounts, and ATAs
-> - [Solana Kit](https://www.solanakit.com/) — the JS SDK used for building and sending transactions
-> - [Metaplex Token Metadata](https://www.metaplex.com/docs/smart-contracts/token-metadata) — attaching metadata to SPL tokens
-> - [Metaplex Core](https://www.metaplex.com/docs/smart-contracts/core) — the NFT standard used in the NFT scripts
+- [Initial metadata](https://raw.githubusercontent.com/aashwani106/spl-nft-q326/main/tests/fixtures/core-metadata.json)
+- [Updated metadata](https://raw.githubusercontent.com/aashwani106/spl-nft-q326/main/tests/fixtures/core-metadata-updated.json)
 
-## SPL Token
+Both fixtures contain validated `name`, `description`, and self-contained SVG image data.
 
-Uses **@solana/kit** and **@solana-program/token** for transactions, and **mpl-token-metadata** via UMI for on-chain metadata.
+## Devnet Evidence
 
-| Script | Command | What it does |
-|---|---|---|
-| `spl_init.ts` | `npm run spl:init` | Creates a new mint account |
-| `spl_metadata.ts` | `npm run spl:metadata` | Attaches a name, symbol, and URI to the mint |
-| `spl_mint.ts` | `npm run spl:mint` | Creates your associated token account and mints tokens into it |
-| `spl_transfer.ts` | `npm run spl:transfer` | Sends tokens to another wallet i.e ata to ata |
+| Action | Address / Signature |
+| --- | --- |
+| SPL Mint Address | [3rZ3ndk8LFPjcmWYveZ9ijFC7oX76Udz3eaejik5HU1b](https://explorer.solana.com/address/3rZ3ndk8LFPjcmWYveZ9ijFC7oX76Udz3eaejik5HU1b?cluster=devnet) |
+| SPL Mint Tx | [PArgxi…rn7Y](https://explorer.solana.com/tx/PArgxiUhaUAHCxdkmD2dfbh2W4XrtKQyNdHMKGyTxDEFSVru7v96y216BfdfTDCA3w8eLH7xeh7T6jvQ5bErn7Y?cluster=devnet) |
+| SPL Supply Tx | [2GDbW…wN6d](https://explorer.solana.com/tx/2GDbWqGvQBgQkruGW253M5yiDgCWLK9zDksXfsCrAmBtz7aouSavyQbyLgm83canwtTH7EHJa8sLQL89CUpDwN6d?cluster=devnet) |
+| SPL Transfer Tx | [2KZwU…bCQk](https://explorer.solana.com/tx/2KZwUoc9qby61nUkq2CbCXYThijBLkbCrHvEgCDmbZm4fGn1maGDceRcqg3bEKxRkYPmfN6Re1UQkdxBtx6QbCQk?cluster=devnet) |
+| NFT Asset | [LfYR3PZM8Ny1K4bdYhGBrf1JireYwDSCK5iKgDHi5JV](https://explorer.solana.com/address/LfYR3PZM8Ny1K4bdYhGBrf1JireYwDSCK5iKgDHi5JV?cluster=devnet) |
+| NFT Create Tx | [4MRT2…wPNk](https://explorer.solana.com/tx/4MRT2emhP2AKukfsDV7gZpw5CbmJ9E8cHuPpCYvC1fmRA64n3GeYtonXabWhe63xdptnwHhxcdir2DfB9ikQwPNk?cluster=devnet) |
+| NFT Update Tx | [3yref…47G1](https://explorer.solana.com/tx/3yref8LLNHav6uyH7vXienDwE1viT9QbPurBKCXAA5A4DbbuvCHUtjgDCwdcg1Ed7fjxpDyJV2HGqRUNyWuS47G1?cluster=devnet) |
+| NFT Transfer Tx | [4AajQ…V5MFf](https://explorer.solana.com/tx/4AajQCeYHYcNEf6CBw6rsx8wPTfhNaSWi25vrzZvKgnLzSGkZomkzGp5v1ZuSE9VgKGUXJ6ZgUwxCMNxci7V5MFf?cluster=devnet) |
+| NFT Burn Tx | [3h4Mz…11uzu](https://explorer.solana.com/tx/3h4Mz2DyMCTwBjQbGNECzUHhpEpEEmcsk5vSHUZWPyXgVNq3aEBSjuW5qKieTybS6L2rwJYdVrJbhdNNdvg11uzu?cluster=devnet) |
 
-Run them in order. Each script logs the addresses/signatures you'll need to paste into the next one.
+The unauthorized update was rejected during simulation with MPL Core `NoApprovalsError`; no invalid transaction was submitted. The burn finalized and left the expected non-deserializable Core tombstone.
 
----
+## Screenshots
 
-## NFT
+Required:
 
-Uses **@solana/kit** and **mpl-core** via UMI. Images and metadata are stored on Irys (decentralized storage).
-
-| Script | Command | What it does |
-|---|---|---|
-| `nft_image.ts` | `npm run nft:image` | Uploads your image to Irys, logs the image URI |
-| `nft_metadata.ts` | `npm run nft:metadata` | Builds the metadata JSON and uploads it, logs the metadata URI |
-| `nft_mint.ts` | `npm run nft:mint` | Mints the NFT on-chain using the metadata URI |
-
-Run them in order. Paste the URI logged by each step into the next script before running it.
+1. SPL Mint — <!-- Insert screenshot -->
+2. SPL Transfer — <!-- Insert screenshot -->
+3. NFT Create — <!-- Insert screenshot -->
+4. NFT Update — <!-- Insert screenshot -->
+5. NFT Transfer — <!-- Insert screenshot -->
+6. NFT Burn — <!-- Insert screenshot -->

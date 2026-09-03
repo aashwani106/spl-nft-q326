@@ -1,89 +1,78 @@
+import { address } from "@solana/kit";
 import {
-  address,
-  appendTransactionMessageInstructions,
-  assertIsTransactionWithBlockhashLifetime,
-  createKeyPairSignerFromBytes,
-  createSolanaRpc,
-  createSolanaRpcSubscriptions,
-  createTransactionMessage,
-  getSignatureFromTransaction,
-  sendAndConfirmTransactionFactory,
-  setTransactionMessageFeePayerSigner,
-  setTransactionMessageLifetimeUsingBlockhash,
-  signTransactionMessageWithSigners,
-} from "@solana/kit";
-import wallet from "../../devnet-wallet.json";
-import {
+  fetchMaybeToken,
+  fetchToken,
   findAssociatedTokenPda,
-  getCreateAssociatedTokenInstructionAsync,
+  getCreateAssociatedTokenIdempotentInstructionAsync,
   getTransferCheckedInstruction,
   TOKEN_PROGRAM_ADDRESS,
 } from "@solana-program/token";
+import { runCli } from "../cli";
+import { positiveIntegerEnv, requiredEnv } from "../config";
+import { createKitClients, sendInstructions } from "../kit";
+import { withRpcDiagnostics, withTimeout } from "../diagnostics";
+import { recordTransaction, requireState } from "../state";
+import { assertBigIntEqual, toBaseUnits } from "../validation";
+import { loadKitSigner } from "../wallet";
 
-const rpc = createSolanaRpc("https://api.devnet.solana.com");
-
-const rpcSubscriptions = createSolanaRpcSubscriptions(
-  "wss://api.devnet.solana.com",
-);
-
-//paste your mint address got from spl_init.ts
-const mint = address("E2Jazz2VXcVL9RZkn6ZFA4q1YGvgEvrns3Gr6w72DC4w");
-
-//paste the address of the recipient
-const to = address("9EUd4VNcjMAysd7zQk3Q1a4tb28BYndLNBAQDiYnHJ64");
-
-(async () => {
-  try {
-    const signer = await createKeyPairSignerFromBytes(new Uint8Array(wallet));
-    const sendAndConfirm = sendAndConfirmTransactionFactory({
-      rpc,
-      rpcSubscriptions,
-    });
-
-    const [fromAta] = await findAssociatedTokenPda({
+export async function transferSplTokens(recipient = requiredEnv("SPL_RECIPIENT")) {
+  const signer = await loadKitSigner();
+  const mint = address(requireState("splMint"));
+  const to = address(recipient);
+  const decimals = positiveIntegerEnv("SPL_DECIMALS", 6);
+  const amount = toBaseUnits(positiveIntegerEnv("SPL_TRANSFER_AMOUNT", 100), decimals);
+  const [source] = await withTimeout(
+    "Derive source associated token account",
+    findAssociatedTokenPda({
       mint,
       owner: signer.address,
       tokenProgram: TOKEN_PROGRAM_ADDRESS,
-    });
-    console.log(`Your fromAta is : ${fromAta}`);
+    }),
+  );
+  const [destination] = await withTimeout(
+    "Derive destination associated token account",
+    findAssociatedTokenPda({ mint, owner: to, tokenProgram: TOKEN_PROGRAM_ADDRESS }),
+  );
+  const { rpc } = createKitClients();
+  const sourceBefore = (
+    await withRpcDiagnostics(
+      "Fetch source ATA before transfer",
+      fetchToken(rpc, source, { commitment: "confirmed" }),
+    )
+  ).data.amount;
+  const existingDestination = await withRpcDiagnostics(
+    "Fetch destination ATA before transfer",
+    fetchMaybeToken(rpc, destination, { commitment: "confirmed" }),
+  );
+  const destinationBefore = existingDestination.exists ? existingDestination.data.amount : 0n;
+  const signature = await sendInstructions(signer, [
+    await withTimeout(
+      "Build idempotent destination ATA instruction",
+      getCreateAssociatedTokenIdempotentInstructionAsync({
+        payer: signer,
+        ata: destination,
+        owner: to,
+        mint,
+      }),
+    ),
+    getTransferCheckedInstruction({ source, mint, destination, authority: signer, amount, decimals }),
+  ]);
+  const [sourceAfter, destinationAfter] = await Promise.all([
+    withRpcDiagnostics("Verify source ATA after transfer", fetchToken(rpc, source, { commitment: "confirmed" })),
+    withRpcDiagnostics("Verify destination ATA after transfer", fetchToken(rpc, destination, { commitment: "confirmed" })),
+  ]);
+  assertBigIntEqual(sourceAfter.data.amount, sourceBefore - amount, "Sender balance");
+  assertBigIntEqual(destinationAfter.data.amount, destinationBefore + amount, "Recipient balance");
+  recordTransaction("splTransfer", signature);
+  return { source, destination, amount, signature };
+}
 
-    const [toAta] = await findAssociatedTokenPda({
-      mint,
-      owner: to,
-      tokenProgram: TOKEN_PROGRAM_ADDRESS,
-    });
-    console.log(`Your toAta is : ${toAta}`);
+async function main() {
+  const result = await transferSplTokens();
+  console.log(`Source ATA: ${result.source}`);
+  console.log(`Recipient ATA: ${result.destination}`);
+  console.log(`Transferred base units: ${result.amount}`);
+  console.log(`Transfer transaction: ${result.signature}`);
+}
 
-    // const createAtaIx =
-
-    // const transferTx =
-
-    const { value: latestBlockhash } = await rpc.getLatestBlockhash().send();
-
-    const msg = createTransactionMessage({ version: 0 });
-
-    const msgWithPayer = setTransactionMessageFeePayerSigner(signer, msg);
-
-    const msgWithLiftime = setTransactionMessageLifetimeUsingBlockhash(
-      latestBlockhash,
-      msgWithPayer,
-    );
-
-    // const txMessage = appendTransactionMessageInstructions(
-    //   [createAtaIx, transferTx],
-    //   msgWithLiftime,
-    // );
-
-    // const signedTx = await signTransactionMessageWithSigners(txMessage);
-
-    // assertIsTransactionWithBlockhashLifetime(signedTx);
-
-    // const signature = getSignatureFromTransaction(signedTx);
-
-    // await sendAndConfirm(signedTx, { commitment: "confirmed" });
-
-    // console.log(`mint txid: ${signature}`);
-  } catch (error) {
-    console.log(error);
-  }
-})();
+if (require.main === module) runCli(main);

@@ -1,0 +1,15 @@
+{
+  "name": "Turbine Core NFT Updated",
+  "description": "Updated devnet metadata used to verify MPL Core update authority behavior.",
+  "image": "data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='512'%20height='512'%3E%3Crect%20width='512'%20height='512'%20fill='%230f766e'/%3E%3Ctext%20x='256'%20y='280'%20font-size='64'%20text-anchor='middle'%20fill='white'%3EUPDATED%3C/text%3E%3C/svg%3E",
+  "attributes": [
+    { "trait_type": "Standard", "value": "MPL Core" },
+    { "trait_type": "Revision", "value": "2" }
+  ],
+  "properties": {
+    "files": [
+      { "uri": "data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='512'%20height='512'%3E%3Crect%20width='512'%20height='512'%20fill='%230f766e'/%3E%3Ctext%20x='256'%20y='280'%20font-size='64'%20text-anchor='middle'%20fill='white'%3EUPDATED%3C/text%3E%3C/svg%3E", "type": "image/svg+xml" }
+    ],
+    "category": "image"
+  }
+}

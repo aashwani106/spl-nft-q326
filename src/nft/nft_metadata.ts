@@ -1,38 +1,64 @@
-import {
-  createSignerFromKeypair,
-  signerIdentity,
-} from "@metaplex-foundation/umi";
-import wallet from "../../devnet-wallet.json";
-import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
-import { irysUploader } from "@metaplex-foundation/umi-uploader-irys";
+import { runCli } from "../cli";
+import { requireState, updateState } from "../state";
+import { createAssignmentUmi } from "../umi";
+import { assertMetadataUri } from "../validation";
+import { inferImageContentType } from "./nft_image";
+import { elapsedMs, withTimeout } from "../diagnostics";
 
-const umi = createUmi(
-  process.env.SOLANA_RPC_URL ?? "https://api.devnet.solana.com",
-);
+export type NftMetadata = {
+  name: string;
+  description: string;
+  image: string;
+  attributes: Array<{ trait_type: string; value: string }>;
+  properties: { files: Array<{ uri: string; type: string }>; category: "image" };
+};
 
-const keypair = umi.eddsa.createKeypairFromSecretKey(new Uint8Array(wallet));
-const signer = createSignerFromKeypair(umi, keypair);
-
-umi.use(
-  irysUploader({
-    address: "https://devnet.irys.xyz/",
-  }),
-);
-
-umi.use(signerIdentity(signer));
-
-(async () => {
-  try {
-    //change the image uri to your image uri obtained from nft_image.ts
-    const image =
-      "https://gateway.irys.xyz/5EDyiNrMWfhjdsEwXLrwkHPwZoZB2m1A2Kudrfxo1tpr";
-
-    //json scheme : https://www.metaplex.com/docs/smart-contracts/core/json-schema
-    //change the metadata
-    // const metadata =
-    // const myUri =
-    // console.log(`metadata uri: ${myUri} `);
-  } catch (error) {
-    console.log("error", error);
+export function validateNftMetadata(metadata: NftMetadata): void {
+  if (!metadata.name.trim()) throw new Error("NFT metadata name is required.");
+  if (!metadata.description.trim()) throw new Error("NFT metadata description is required.");
+  assertMetadataUri(metadata.image);
+  if (!Array.isArray(metadata.attributes)) throw new Error("NFT metadata attributes must be an array.");
+  if (metadata.properties.category !== "image" || metadata.properties.files.length === 0) {
+    throw new Error("NFT metadata must include at least one image file.");
   }
-})();
+  const [file] = metadata.properties.files;
+  if (file.uri !== metadata.image || !file.type.startsWith("image/")) {
+    throw new Error("NFT metadata image file must match the top-level image URI and MIME type.");
+  }
+}
+
+export function buildNftMetadata(image = requireState("imageUri")): NftMetadata {
+  const metadata: NftMetadata = {
+    name: process.env.NFT_NAME ?? "Turbine Core NFT",
+    description:
+      process.env.NFT_DESCRIPTION ?? "An MPL Core NFT created for the Q3 2026 assignment.",
+    image,
+    attributes: [
+      { trait_type: "Standard", value: "MPL Core" },
+      { trait_type: "Network", value: process.env.SOLANA_CLUSTER ?? "devnet" },
+    ],
+    properties: {
+      files: [{ uri: image, type: inferImageContentType(process.env.NFT_IMAGE_PATH ?? "image.jpeg") }],
+      category: "image",
+    },
+  };
+  validateNftMetadata(metadata);
+  return metadata;
+}
+
+export async function uploadNftMetadata(metadata = buildNftMetadata()) {
+  validateNftMetadata(metadata);
+  const { umi } = createAssignmentUmi({ uploader: true });
+  const startedAt = Date.now();
+  console.log(`[upload] NFT metadata: name=${metadata.name} image=${metadata.image}`);
+  const metadataUri = await withTimeout("NFT metadata upload", umi.uploader.uploadJson(metadata));
+  console.log(`[upload] NFT metadata: uri=${metadataUri} elapsed=${elapsedMs(startedAt)}ms`);
+  updateState({ metadataUri });
+  return metadataUri;
+}
+
+async function main() {
+  console.log(`Metadata URI: ${await uploadNftMetadata()}`);
+}
+
+if (require.main === module) runCli(main);

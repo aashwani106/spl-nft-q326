@@ -1,0 +1,15 @@
+{
+  "name": "Turbine Core NFT",
+  "description": "A devnet MPL Core asset used to verify the assignment lifecycle.",
+  "image": "data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='512'%20height='512'%3E%3Crect%20width='512'%20height='512'%20fill='%235b21b6'/%3E%3Ctext%20x='256'%20y='280'%20font-size='72'%20text-anchor='middle'%20fill='white'%3ECORE%3C/text%3E%3C/svg%3E",
+  "attributes": [
+    { "trait_type": "Standard", "value": "MPL Core" },
+    { "trait_type": "Network", "value": "devnet" }
+  ],
+  "properties": {
+    "files": [
+      { "uri": "data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='512'%20height='512'%3E%3Crect%20width='512'%20height='512'%20fill='%235b21b6'/%3E%3Ctext%20x='256'%20y='280'%20font-size='72'%20text-anchor='middle'%20fill='white'%3ECORE%3C/text%3E%3C/svg%3E", "type": "image/svg+xml" }
+    ],
+    "category": "image"
+  }
+}
