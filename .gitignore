@@ -14,3 +14,4 @@ images-cat.jpeg
 
 wallet.json
 .assignment-state.json
+*.log
